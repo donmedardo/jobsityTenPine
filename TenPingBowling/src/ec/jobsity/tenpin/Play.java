@@ -148,6 +148,9 @@ public class Play {
 			throw new Exception("Existe un numero incorrecto de registros");
 		}
 		
+		if(numFrame<10) {
+			throw new Exception("Existe un numero incorrecto de registros");
+		}
 		
 		return valoresPorTurno;
 	}
