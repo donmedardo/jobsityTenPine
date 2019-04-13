@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -165,21 +167,61 @@ public class Play {
 				suma = suma +valor;
 			}
 			
-			if(valores.size()==1) {
+			if(valores.size()==1&&tiros.get(clave+1).size()==1) {
+				sumaTotal = sumaTotal+megaChusa(valores,tiros.get(clave+1),tiros.get(clave+2));
+			}
+			
+			else if(valores.size()==1&&tiros.get(clave+1).size()!=1) {
 				sumaTotal = sumaTotal+chusa(valores,tiros.get(clave+1));
 			}else if(suma ==10) {
 				sumaTotal = sumaTotal+semiPlena(valores,tiros.get(clave+1));
+			}else if(suma !=10) {
+				sumaTotal = sumaTotal+none(valores);
+				
 			}
 			scoreRes.put(entry.getKey().toString(), sumaTotal);
 		}
 		return scoreRes;
 	}
 
+	public int megaChusa(List<Integer> first,List<Integer>second,List<Integer>third) {
+		int sum=0;
+		
+		if(first!=null && !first.isEmpty()) {
+			sum = sum+first.get(0);
+		}
+		if(second!=null && !second.isEmpty()) {
+			sum = sum+second.get(0);
+		}
+		if(third!=null && !third.isEmpty()) {
+			sum =  sum+third.get(0)+(third.size()>1? third.get(1):0) ;
+		}
+		
+		
+		return  sum;
+	}
+	
 	public int chusa(List<Integer> first,List<Integer>second) {
-		return first.get(0)+ second.get(0)+ (second.size()>1? second.get(1):0) ;
+		
+		int sum=0;
+		
+		if(first!=null && !first.isEmpty()) {
+			sum = sum+first.get(0);
+		}
+		if(second!=null && !second.isEmpty()) {
+			sum = sum+second.get(0)+ (second.size()>1? second.get(1):0) ;
+		}
+		
+		
+		
+		return  sum;
 	}
 	
 	public int semiPlena(List<Integer> first,List<Integer>second) {
 		return first.get(0)+ (first.size()>1?first.get(1):0)+second.get(0);
+	}
+	
+	public int none(List<Integer> first) {
+		return first.get(0)+ (first.size()>1?first.get(1):0);
 	}
 }
