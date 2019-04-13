@@ -71,9 +71,9 @@ public class Play {
 		drawHeader();
 		for (String player : players) {
 			List<Intent> play = intents.stream().filter(p -> p.getName().equals(player)).collect(Collectors.toList());
-			StringBuilder pinfalls = new StringBuilder();
 			System.out.println(player);
 			System.out.println(drawPinFalls(play));
+			System.out.println(drawScore((play)));
 		}
 
 	}
@@ -81,33 +81,46 @@ public class Play {
 	private String drawPinFalls(List<Intent> play) {
 		StringBuilder pinfalls = new StringBuilder();
 		pinfalls.append("pinfalls").append("\t");
-		Map<Integer, List<String>> valoresPorTurno = getPlayForPerson(play);
+		Map<Integer, List<Integer>> valoresPorTurno = getPlayForPerson(play);
 		StringBuilder values = new StringBuilder();
-		for (Entry<Integer, List<String>> entry : valoresPorTurno.entrySet()) {
-			for (String string : entry.getValue()) {
-				values.append(string.equals("10") ? "x" : string).append(" ");
+		for (Entry<Integer, List<Integer>> entry : valoresPorTurno.entrySet()) {
+			for (Integer string : entry.getValue()) {
+				values.append(string==10 ? "x" : string).append(" ");
 			}
 			values.append("\t");
 		}
 		pinfalls.append(values);
 		return pinfalls.toString();
 	}
+	
+	private String drawScore(List<Intent> play) {
+		StringBuilder pinfalls = new StringBuilder();
+		pinfalls.append("score").append("\t\t");
+		Map<Integer, List<Integer>> valoresPorTurno = getPlayForPerson(play);
+		Map<String,Integer> scoreResult= score(valoresPorTurno);
+		for (Entry<String,Integer >score : scoreResult.entrySet()) {
+			pinfalls.append(score.getValue()).append("\t");
+		}
+		
+		return pinfalls.toString();
+	}
+	
+	
 
-	private Map<Integer, List<String>> getPlayForPerson(List<Intent> play) {
-		Map<Integer, List<String>> valoresPorTurno = new HashMap<>();
-		List<String> valores = new ArrayList<String>();
+	private Map<Integer, List<Integer>> getPlayForPerson(List<Intent> play) {
+		Map<Integer, List<Integer>> valoresPorTurno = new HashMap<>();
+		List<Integer> valores = new ArrayList<Integer>();
 
 		int count = 0;
 		int numFrame = 0;
 		for (Intent intent : play) {
-			//System.out.println(intent.getValue());
 			count++;
-			valores.add(intent.getValue());
+			valores.add(isNumeric(intent.getValue())?  Integer.parseInt(intent.getValue()):0);
 			if ( numFrame!=9&& isNumeric(intent.getValue())) {
 				if (Integer.parseInt(intent.getValue()) == 10 || count == 2) {
 					numFrame++;
 					valoresPorTurno.put(numFrame, valores);
-					valores = new ArrayList<String>();
+					valores = new ArrayList<Integer>();
 					count = 0;
 					continue;
 				}
@@ -115,7 +128,7 @@ public class Play {
 				if (count == 2) {
 					numFrame++;
 					valoresPorTurno.put(numFrame, valores);
-					valores = new ArrayList<String>();
+					valores = new ArrayList<Integer>();
 					count = 0;
 					continue;
 				}
@@ -140,8 +153,33 @@ public class Play {
 		}
 		System.out.println(heaader);
 	}
+	
+	public Map<String,Integer> score(Map<Integer, List<Integer>> tiros) {
+		Map<String,Integer> scoreRes= new HashMap<String, Integer>(); 
+		int sumaTotal =0;
+		for (Entry<Integer, List<Integer>> entry : tiros.entrySet()) {
+			List<Integer> valores =entry.getValue();
+			Integer clave =entry.getKey();
+			int suma =0;
+			for(Integer valor :valores) {
+				suma = suma +valor;
+			}
+			
+			if(valores.size()==1) {
+				sumaTotal = sumaTotal+chusa(valores,tiros.get(clave+1));
+			}else if(suma ==10) {
+				sumaTotal = sumaTotal+semiPlena(valores,tiros.get(clave+1));
+			}
+			scoreRes.put(entry.getKey().toString(), sumaTotal);
+		}
+		return scoreRes;
+	}
 
-	public void rulers() {
-
+	public int chusa(List<Integer> first,List<Integer>second) {
+		return first.get(0)+ second.get(0)+ (second.size()>1? second.get(1):0) ;
+	}
+	
+	public int semiPlena(List<Integer> first,List<Integer>second) {
+		return first.get(0)+ (first.size()>1?first.get(1):0)+second.get(0);
 	}
 }
