@@ -74,13 +74,18 @@ public class Play {
 		for (String player : players) {
 			List<Intent> play = intents.stream().filter(p -> p.getName().equals(player)).collect(Collectors.toList());
 			System.out.println(player);
-			System.out.println(drawPinFalls(play));
-			System.out.println(drawScore((play)));
+			try {
+				System.out.println(drawPinFalls(play));
+				System.out.println(drawScore((play)));
+			} catch (Exception e) {
+				System.out.println("ERROR En los registros de "+ player +" "+e.getMessage());
+			}
+			
 		}
 
 	}
 
-	private String drawPinFalls(List<Intent> play) {
+	private String drawPinFalls(List<Intent> play) throws Exception {
 		StringBuilder pinfalls = new StringBuilder();
 		pinfalls.append("pinfalls").append("\t");
 		Map<Integer, List<Integer>> valoresPorTurno = getPlayForPerson(play);
@@ -95,7 +100,7 @@ public class Play {
 		return pinfalls.toString();
 	}
 	
-	private String drawScore(List<Intent> play) {
+	private String drawScore(List<Intent> play) throws Exception {
 		StringBuilder pinfalls = new StringBuilder();
 		pinfalls.append("score").append("\t\t");
 		Map<Integer, List<Integer>> valoresPorTurno = getPlayForPerson(play);
@@ -109,7 +114,7 @@ public class Play {
 	
 	
 
-	private Map<Integer, List<Integer>> getPlayForPerson(List<Intent> play) {
+	private Map<Integer, List<Integer>> getPlayForPerson(List<Intent> play) throws Exception {
 		Map<Integer, List<Integer>> valoresPorTurno = new HashMap<>();
 		List<Integer> valores = new ArrayList<Integer>();
 
@@ -137,7 +142,13 @@ public class Play {
 			}
 		}
 		numFrame++;
-		valoresPorTurno.put(numFrame, valores);
+		if(valores!=null && valores.size()==3) {
+			valoresPorTurno.put(numFrame, valores);
+		}else {
+			throw new Exception("Existe un numero incorrecto de registros");
+		}
+		
+		
 		return valoresPorTurno;
 	}
 
